@@ -10,19 +10,12 @@ cpxpol(double r, double a)
     };
 }
 
-void
-cpxstr(complex_t z, char* str)
+complex_t
+cpxcnj(complex_t z)
 {
-    if (z.im < 0)
-        sprintf(str, "%g - %g i", z.re, -z.im);
-    else
-        sprintf(str, "%g + %g i", z.re, z.im);
-}
-
-void
-cpxstre(complex_t z, char* str)
-{
-    sprintf(str, "%g exp(%g i)", cpxmod(z), cpxarg(z));
+    return (complex_t) {
+        z.re, z.im * -1
+    };
 }
 
 double
@@ -35,14 +28,6 @@ double
 cpxarg(complex_t z)
 {
     return atan2(z.im, z.re);
-}
-
-complex_t
-cpxcnj(complex_t z)
-{
-    return (complex_t) {
-        z.re, z.im * -1
-    };
 }
 
 complex_t
@@ -106,4 +91,19 @@ cpxnrt(complex_t z, double n, unsigned k)
     double a = (cpxarg(z) + 2 * k * M_PI) / n;
 
     return cpxpol(r, a);
+}
+
+void
+cpxstr(complex_t z, char* str)
+{
+    if (z.im < 0)
+        sprintf(str, "%g - %g i", z.re, -z.im);
+    else
+        sprintf(str, "%g + %g i", z.re, +z.im);
+}
+
+void
+cpxstre(complex_t z, char* str)
+{
+    sprintf(str, "%g exp(%g i)", cpxmod(z), cpxarg(z));
 }

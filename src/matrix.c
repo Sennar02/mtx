@@ -5,62 +5,142 @@
 
 struct matrix
 {
-    complex_t** data;
+    complex_t* data;
 
-    unsigned m;
-    unsigned n;
+    unsigned h;
+    unsigned w;
 };
 
 matrix_t*
-mtxnew(unsigned m, unsigned n)
+mtxnew(unsigned h, unsigned w)
 {
-    matrix_t* mtx;
-    
-    mtx = (matrix_t*) malloc(sizeof(matrix_t));
-    *mtx = (matrix_t) { (complex_t**) calloc(m, sizeof(complex_t*)), m, n };
+    matrix_t* ptr = (matrix_t*) malloc(sizeof(matrix_t));
 
-    for (int i = 0; i < m; i++) {
-        mtx->data[i] = (complex_t*) calloc(n, sizeof(complex_t));
+    if (ptr != NULL) {
+        (*ptr) = (matrix_t) { 
+            (complex_t*) calloc(h * w + 1, sizeof(complex_t)),
+            h: h, w: w
+        };
     }
 
-    return mtx;
+    return ptr;
 }
 
 void
-mtxstr(matrix_t* a, char* str)
+mtxdel(matrix_t* m)
 {
-    char buf[200];
+    if (m != NULL) {
+        if (m->data != NULL) 
+            free(m->data);
 
-    if (a && a->data) {
-        for (int i = 0; i < a->m; i++) {
-            for (int j = 0; j < a->n; j++) {
-                cpxstr(a->data[i][j], buf);
-                sprintf(str, "%s\t", buf);
-            }
-
-            sprintf(str, "\n");
-        }
+        free(m);
     }
 }
 
-void
-mtxset(matrix_t* a, complex_t z, unsigned i, unsigned j)
+unsigned
+mtxhgt(matrix_t* m)
 {
-    if (a && a->data) {
-        if (i >= 0 && i <= a->m && j >= 0 && j <= a->n) {
-            a->data[i][j] = z;
-        }
+    if (m != NULL)
+        return m->h;
+
+    return 0;
+}
+
+unsigned
+mtxwdt(matrix_t* m)
+{
+    if (m != NULL)
+        return m->w;
+
+    return 0;
+}
+
+void
+mtxset(matrix_t* m, unsigned i, unsigned j, complex_t z)
+{
+    if (m != NULL && m->data != NULL) {
+        if ((i >= 0 && i <= m->h) &&
+            (j >= 0 && j <= m->w))
+            m->data[i * m->w + j] = z;
     }
 }
 
 complex_t*
-mtxget(matrix_t* a, unsigned i, unsigned j)
+mtxget(matrix_t* m, unsigned i, unsigned j)
 {
-    if (a && a->data) {
-        if (i >= 0 && i <= a->m && j >= 0 && j <= a->n) {
-            return &a->data[i][j];
-        }
+    if (m != NULL && m->data != NULL) {
+        if ((i >= 0 && i <= m->h) &&
+            (j >= 0 && j <= m->w))
+            return &m->data[i * m->w + j];
     }
 
     return NULL;
+}
+
+void
+mtxaddn(matrix_t* m, complex_t z)
+{
+    if (m != NULL && m->data != NULL) {
+        for (int i = 0; i < m->h; i++) {
+            for (int j = 0; j < m->w; j++) {
+                m->data[i * m->w + j] = cpxadd(m->data[i * m->w + j], z);
+            }
+        }
+    }
+}
+
+void
+mtxadd(matrix_t* a, matrix_t* b)
+{
+    if ((a != NULL && a->data != NULL) &&
+        (b != NULL && b->data != NULL) &&
+        (a->h == b->h && a->w == b->w)) {
+        for (int i = 0; i < a->h; i++) {
+            for (int j = 0; j < a->w; j++) {
+                a->data[i * a->w + j] = cpxadd(a->data[i * a->w + j], b->data[i * a->w + j]);
+            }
+        }
+    }
+}
+
+void
+mtxstr(matrix_t* m, char* str)
+{
+    char buf[200] = {0};
+
+    if (m != NULL && m->data != NULL) {
+        for (int i = 0; i < m->h; i++) {
+            str += sprintf(str, "| ");
+
+            for (int j = 0; j < m->w; j++) {
+                cpxstr(m->data[i * m->w + j], buf);
+                str += sprintf(str, "%*s ",
+                    (j != 0) * 20, buf
+                );
+            }
+
+            str += sprintf(str, "|\n");
+        }
+    }
+}
+
+void
+mtxstre(matrix_t* m, char* str)
+{
+    char buf[200] = {0};
+
+    if (m != NULL && m->data != NULL) {
+        for (int i = 0; i < m->h; i++) {
+            str += sprintf(str, "| ");
+
+            for (int j = 0; j < m->w; j++) {
+                cpxstre(m->data[i * m->w + j], buf);
+                str += sprintf(str, "%*s ",
+                    (j != 0) * 20, buf
+                );
+            }
+
+            str += sprintf(str, "|\n");
+        }
+    }
 }
