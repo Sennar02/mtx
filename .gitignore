@@ -1,2 +1,5 @@
-# Cartella di output degli eseguibili.
+# Output folder.
 build/
+
+# Program entry point.
+src/main.c

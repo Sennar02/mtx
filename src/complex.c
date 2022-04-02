@@ -3,107 +3,120 @@
 #include "complex.h"
 
 complex_t
-cpxpol(double r, double a)
+cpx_pol(double r, double a)
 {
-    return (complex_t) {
-        r * cos(a), r * sin(a)
+    complex_t z = {
+        re: r * cos(a),
+        im: r * sin(a)
     };
+
+    return z;
 }
 
 complex_t
-cpxcnj(complex_t z)
+cpx_cnj(complex_t z)
 {
-    return (complex_t) {
-        z.re, z.im * -1
+    complex_t c = {
+        re: z.re,
+        im: z.im * -1
     };
+
+    return c;
 }
 
 double
-cpxmod(complex_t z)
+cpx_mod(complex_t z)
 {
-    return pow(z.re * z.re + z.im * z.im, 1.0 / 2.0);
+    return pow((z.re * z.re) + (z.im * z.im), 0.5);
 }
 
 double
-cpxarg(complex_t z)
+cpx_arg(complex_t z)
 {
     return atan2(z.im, z.re);
 }
 
 complex_t
-cpxadd(complex_t a, complex_t b)
+cpx_add(complex_t a, complex_t b)
 {
-    return (complex_t) {
-        a.re + b.re, a.im + b.im
+    complex_t z = {
+        re: a.re + b.re,
+        im: a.im + b.im
     };
+
+    return z;
 }
 
 complex_t
-cpxopp(complex_t z)
+cpx_opp(complex_t z)
 {
-    return (complex_t) {
-        -z.re, -z.im
+    complex_t o = {
+        re: z.re * -1,
+        im: z.im * -1
     };
+
+    return o;
 }
 
 complex_t
-cpxsub(complex_t a, complex_t b)
+cpx_sub(complex_t a, complex_t b)
 {
-    return cpxadd(a, cpxopp(b));
+    return cpx_add(a, cpx_opp(b));
 }
 
 complex_t
-cpxmul(complex_t a, complex_t b)
+cpx_mul(complex_t a, complex_t b)
 {
-    return (complex_t) {
-        a.re * b.re - a.im * b.im,
-        a.re * b.im + a.im * b.re
+    complex_t z = {
+        re: a.re * b.re - a.im * b.im,
+        im: a.re * b.im + a.im * b.re
     };
+
+    return z;
 }
 
 complex_t
-cpxrpc(complex_t z)
+cpx_rpc(complex_t z)
 {
-    complex_t conj = cpxcnj(z),
-              mod2 = cpxmul(z, conj);
+    complex_t conj = cpx_cnj(z),
+              mod2 = cpx_mul(z, conj);
 
-    return (complex_t) {
-        conj.re / mod2.re, conj.im / mod2.re
+    complex_t r = {
+        re: conj.re / mod2.re,
+        im: conj.im / mod2.re
     };
+
+    return r;
 }
 
 complex_t
-cpxdiv(complex_t a, complex_t b)
+cpx_div(complex_t a, complex_t b)
 {
-    return cpxmul(a, cpxrpc(b));
+    return cpx_mul(a, cpx_rpc(b));
 }
 
 complex_t
-cpxpow(complex_t z, double n)
+cpx_exp(complex_t z)
 {
-    return cpxnrt(z, 1.0 / n, 0);
+    return cpx_pol(exp(z.re), z.im);
 }
 
 complex_t
-cpxnrt(complex_t z, double n, unsigned k)
+cpx_log(complex_t z)
 {
-    double r = pow(cpxmod(z), 1.0 / n);
-    double a = (cpxarg(z) + 2 * k * M_PI) / n;
+    complex_t l = {
+        re: log(cpx_mod(z)),
+        im: cpx_arg(z)
+    };
 
-    return cpxpol(r, a);
+    return l;
 }
 
-void
-cpxstr(complex_t z, char* str)
+unsigned
+cpx_str(complex_t z, char* s)
 {
-    if (z.im < 0)
-        sprintf(str, "%g - %g i", z.re, -z.im);
-    else
-        sprintf(str, "%g + %g i", z.re, +z.im);
-}
+    if (s != NULL)
+        return sprintf(s, "(%g, %g)", z.re, z.im);
 
-void
-cpxstre(complex_t z, char* str)
-{
-    sprintf(str, "%g exp(%g i)", cpxmod(z), cpxarg(z));
+    return 0;
 }
