@@ -5,15 +5,16 @@ project('mtx', 'c',
 
 # C source files to compile.
 srcFiles = [
+    'src/matrix.c',
     'src/complex.c',
     'src/main.c'
 ]
 
-# Actual C compiler used.
+# Actual C compiler being used.
 compiler = meson.get_compiler('c')
 
-# Creates the mtx executable compiling all
-# the source files with additional dependencies.
+# Creates the executable compiling all the
+# source files and libraries.
 executable('mtx', srcFiles, dependencies: [
     compiler.find_library('m', required: true)
 ])

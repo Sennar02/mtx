@@ -1,5 +1,2 @@
 # Output folder.
 build/
-
-# Program entry point.
-src/main.c
